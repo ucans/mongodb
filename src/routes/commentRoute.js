@@ -1,9 +1,7 @@
 const { Router } = require('express');
 // blogIdx 가져올 수 있음
 const commentRoute = Router({ mergeParams: true });
-const { Comment } = require('../models/Comment');
-const { Blog } = require('../models/Blog');
-const { User } = require('../models/User');
+const { Blog, User, Comment } = require('../models');
 const mongoose = require('mongoose');
 
 /**

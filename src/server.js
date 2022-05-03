@@ -4,8 +4,7 @@ const { del } = require('express/lib/application');
 const { type } = require('express/lib/response');
 // express 사용
 const app = express();
-const { userRouter } = require('./routes/userRoute');
-const { blogRouter } = require('./routes/blogRoute');
+const { userRouter, blogRouter } = require('./routes'); // ./routes 안의 index.js 불러옴
 const mongoose = require('mongoose');
 
 const MONGO_URI = 'mongodb+srv://admin:HyUqimjcaWnMEQ3D@mongodbtutorial.omukq.mongodb.net/BlogService?retryWrites=true&w=majority';
