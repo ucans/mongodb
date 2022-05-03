@@ -6,6 +6,7 @@ const { type } = require('express/lib/response');
 const app = express();
 const { userRouter, blogRouter } = require('./routes'); // ./routes 안의 index.js 불러옴
 const mongoose = require('mongoose');
+const { generateFakeData } = require('../faker');
 
 const MONGO_URI = 'mongodb+srv://admin:HyUqimjcaWnMEQ3D@mongodbtutorial.omukq.mongodb.net/BlogService?retryWrites=true&w=majority';
 
@@ -15,7 +16,7 @@ const server = async () => {
         // useFindAndModify = false 추가하는 게 좋음. 내부적으로 findAndModify 쓰는데, 추천안하기때문.
         mongoose.set('debug', true); // Query 변경 보여줌.
         app.use(express.json()); // json parsing
-
+        // generateFakeData(100, 10, 300);
         // Middleware
         app.use('/user', userRouter);
         app.use('/blog', blogRouter);

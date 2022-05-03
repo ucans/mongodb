@@ -1,20 +1,23 @@
 {
-  "name": "mongodb",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^4.17.3",
-    "mongoose": "^6.2.10"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.15"
-  }
+    "name": "mongodb",
+    "version": "1.0.0",
+    "description": "mongodb tutorial",
+    "main": "src/server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node src/server.js",
+        "dev": "nodemon --ignore client.js src/server.js",
+        "client": "nodemon client.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "axios": "^0.27.2",
+        "express": "^4.17.3",
+        "faker": "^5.5.3",
+        "mongoose": "^6.2.10"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.15"
+    }
 }
