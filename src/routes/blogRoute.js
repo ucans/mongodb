@@ -21,7 +21,9 @@ blogRouter.post('/', async (req, res) => {
         console.log({ user });
         if (!user) res.status(400).send({ err: 'user dose not exists.' });
 
-        let blog = new Blog({ ...req.body, user });
+        // Mongoose 6
+        // user 데이터 object 자체를 삽입해야함. by .toObject
+        let blog = new Blog({ ...req.body, user: user.toObject() });
         await blog.save();
         return res.send({ blog });
     } catch (err) {
