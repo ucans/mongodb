@@ -3,8 +3,8 @@ const { Router } = require('express');
 const commentRoute = Router({ mergeParams: true });
 const { Comment } = require('../models/Comment');
 const { Blog } = require('../models/Blog');
-const mongoose = require('mongoose');
 const { User } = require('../models/User');
+const mongoose = require('mongoose');
 
 /**
  * /user
@@ -23,15 +23,18 @@ commentRoute.post('/', async (req, res) => {
         if (!mongoose.isValidObjectId(blogIdx)) return res.status(400).send({ err: 'invalid blog' });
 
         // user doc 받아옴.
-        let user = await User.findById(userIdx);
-        if (!user) return res.status(400).send({ err: 'the user not exists.' });
-
+        // let user = await User.findById(userIdx);
         // blog doc 받아옴.
-        let blog = await Blog.findById(blogIdx);
+        // let blog = await Blog.findById(blogIdx);
+
+        // 병렬처리
+        const [user, blog] = await Promise.all([User.findById(userIdx), Blog.findById(blogIdx)]);
+        if (!user) return res.status(400).send({ err: 'the user not exists.' });
         if (!blog) return res.status(400).send({ err: 'the blogIdx Blog not exists.' });
+        if (!blog.islive) return res.status(405).send({ err: 'the blog is not live.' });
 
         // 저장할 때는 user/blog doc에 있는 _id를 참조 저장.
-        const commentRequst = new Comment({ content: content, user: user, blog: blog });
+        const commentRequst = new Comment({ content, user, blog });
         await commentRequst.save();
         return res.send(commentRequst);
     } catch (err) {
@@ -42,7 +45,24 @@ commentRoute.post('/', async (req, res) => {
 
 commentRoute.get('/', async (req, res) => {
     try {
-        const comments = await Comment.find({});
+        const { blogIdx } = req.params;
+        let comments = await Comment.find({ blog: blogIdx });
+
+        // todo : Array.map() or Array.foreach() 바꿀 수 있길
+        comments = await Promise.all(
+            comments.map((comment) => {
+                return Promise.all([User.findById(comment.user), Blog.findById(comment.blog)]) //
+                    .then((object) => {
+                        [comment.user, comment.blog] = object;
+                        return comment;
+                    });
+            })
+        );
+
+        //for (const comment of comments) {
+        //    [comment.user, comment.blog] = await Promise.all([User.findById(comment.user), Blog.findById(comment.blog)]);
+        //}
+
         return res.send({ comments });
     } catch (err) {
         console.log({ err });
