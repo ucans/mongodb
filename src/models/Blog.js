@@ -10,5 +10,15 @@ const BlogSchema = new Schema(
     { timestamps: true } // createdAt, updateAt
 );
 
+// 가상의 key 생성
+BlogSchema.virtual('comments', {
+    ref: 'comment',
+    localField: '_id',
+    foreignField: 'blog',
+});
+
+BlogSchema.set('toObject', { virtuals: true });
+BlogSchema.set('toJSON', { virtuals: true });
+
 const Blog = model('blog', BlogSchema);
 module.exports = { Blog };

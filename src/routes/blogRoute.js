@@ -34,7 +34,12 @@ blogRouter.post('/', async (req, res) => {
 
 blogRouter.get('/', async (req, res) => {
     try {
-        const blogs = await Blog.find({}).limit(10);
+        // production에서 사용 가능할 정도의 성능
+        // populate를 통해, 총 4번 db 연결
+        const blogs = await Blog.find({})
+            .limit(20)
+            .populate([{ path: 'user' }, { path: 'comments', populate: { path: 'user' } }]);
+
         return res.send({ blogs });
     } catch (err) {
         console.log({ err });
