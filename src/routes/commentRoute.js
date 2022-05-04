@@ -32,9 +32,9 @@ commentRoute.post('/', async (req, res) => {
         if (!blog.islive) return res.status(405).send({ err: 'the blog is not live.' });
 
         // 저장할 때는 user/blog doc에 있는 _id를 참조 저장.
-        const commentRequst = new Comment({ content, user, blog });
-        await commentRequst.save();
-        return res.send(commentRequst);
+        const comment = new Comment({ content, user, blog });
+        await comment.save();
+        return res.send({ comment });
     } catch (err) {
         console.log({ err });
         res.status(500).send({ ErrorType: err.name, ErrorMessage: err.message });
@@ -47,19 +47,15 @@ commentRoute.get('/', async (req, res) => {
         let comments = await Comment.find({ blog: blogIdx });
 
         // todo : Array.map() or Array.foreach() 바꿀 수 있길
-        comments = await Promise.all(
-            comments.map((comment) => {
-                return Promise.all([User.findById(comment.user), Blog.findById(comment.blog)]) //
-                    .then((object) => {
-                        [comment.user, comment.blog] = object;
-                        return comment;
-                    });
-            })
-        );
-
-        //for (const comment of comments) {
-        //    [comment.user, comment.blog] = await Promise.all([User.findById(comment.user), Blog.findById(comment.blog)]);
-        //}
+        // comments = await Promise.all(
+        //     comments.map((comment) => {
+        //         return Promise.all([User.findById(comment.user), Blog.findById(comment.blog)]) //
+        //             .then((object) => {
+        //                 [comment.user, comment.blog] = object;
+        //                 return comment;
+        //             });
+        //     })
+        // );
 
         return res.send({ comments });
     } catch (err) {

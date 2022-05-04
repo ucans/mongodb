@@ -20,7 +20,7 @@ userRouter.get('/:userId', async (req, res) => {
         const { userId } = req.params;
         if (!mongoose.isValidObjectId(userId)) return res.status(401).send({ err: 'Invalid userId' });
         const user = await User.findOne({ _id: userId }, { username: 1, name: 1, age: 1 });
-        return res.send(user);
+        return res.send({ user });
     } catch (err) {
         console.log(err);
         return res.status(500).send({ err: err.message });
