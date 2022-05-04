@@ -36,6 +36,7 @@ blogRouter.get('/', async (req, res) => {
     try {
         // production에서 사용 가능할 정도의 성능
         // populate를 통해, 총 4번 db 연결
+        // 중복된 유저 한 번만 접근 가능
         const blogs = await Blog.find({})
             .limit(20)
             .populate([{ path: 'user' }, { path: 'comments', populate: { path: 'user' } }]);
