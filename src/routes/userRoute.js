@@ -84,7 +84,6 @@ userRouter.post('/', async (req, res) => {
         await user.save(); // 실제로 저장
         return res.send({ user });
     } catch (err) {
-        console.log(err);
         return res.status(500).send({ err: err.message });
     }
 });

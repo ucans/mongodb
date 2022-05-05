@@ -7,9 +7,7 @@ const URI = 'http://localhost:3000';
 
 const test = async () => {
     console.time('loading time: ');
-    let {
-        data: { blogs },
-    } = await axios.get(`${URI}/blog`);
+    await axios.get(`${URI}/blog`);
     // blogs = await Promise.all(
     //     blogs.map(async (blog) => {
     //         [

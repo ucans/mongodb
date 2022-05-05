@@ -18,7 +18,6 @@ blogRouter.post('/', async (req, res) => {
         if (!mongoose.isValidObjectId(userId)) res.status(400).send({ err: 'userId is invalid' });
 
         let user = await User.findById(userId);
-        console.log({ user });
         if (!user) res.status(400).send({ err: 'user dose not exists.' });
 
         // Mongoose 6
@@ -27,7 +26,6 @@ blogRouter.post('/', async (req, res) => {
         await blog.save();
         return res.send({ blog });
     } catch (err) {
-        console.log({ err });
         res.status(500).send({ err: err.message });
     }
 });
@@ -37,9 +35,8 @@ blogRouter.get('/', async (req, res) => {
         // production에서 사용 가능할 정도의 성능
         // populate를 통해, 총 4번 db 연결
         // 중복된 유저 한 번만 접근 가능
-        const blogs = await Blog.find({})
-            .limit(20)
-            .populate([{ path: 'user' }, { path: 'comments', populate: { path: 'user' } }]);
+        const blogs = await Blog.find({}).limit(200);
+        //.populate([{ path: 'user' }, { path: 'comments', populate: { path: 'user' } }]);
 
         return res.send({ blogs });
     } catch (err) {

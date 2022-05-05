@@ -3,6 +3,7 @@ const { Router } = require('express');
 const commentRoute = Router({ mergeParams: true });
 const { Blog, User, Comment } = require('../models');
 const mongoose = require('mongoose');
+const res = require('express/lib/response');
 
 /**
  * /user
@@ -32,8 +33,8 @@ commentRoute.post('/', async (req, res) => {
         if (!blog.islive) return res.status(405).send({ err: 'the blog is not live.' });
 
         // 저장할 때는 user/blog doc에 있는 _id를 참조 저장.
-        const comment = new Comment({ content, user, blog });
-        await comment.save();
+        const comment = new Comment({ content, user, userFullName: `${user.name.first} ${user.name.last}`, blog });
+        await Promise.all([comment.save(), Blog.updateOne({ _id: blogIdx }, { $push: { comments: comment } })]);
         return res.send({ comment });
     } catch (err) {
         console.log({ err });
@@ -46,7 +47,6 @@ commentRoute.get('/', async (req, res) => {
         const { blogIdx } = req.params;
         let comments = await Comment.find({ blog: blogIdx });
 
-        // todo : Array.map() or Array.foreach() 바꿀 수 있길
         // comments = await Promise.all(
         //     comments.map((comment) => {
         //         return Promise.all([User.findById(comment.user), Blog.findById(comment.blog)]) //
@@ -60,8 +60,19 @@ commentRoute.get('/', async (req, res) => {
         return res.send({ comments });
     } catch (err) {
         console.log({ err });
-        Error;
         res.status(500).send({ ErrorType: err.name, ErrorMessage: err.message });
+    }
+});
+
+commentRoute.get('/:commentIdx', async (req, res) => {
+    try {
+        const { commentIdx } = req.params;
+        if (!mongoose.isValidObjectId(commentIdx)) return res.status(400).send({ err: 'invalid comment' });
+        const comment = await Comment.findById(commentIdx);
+        return res.send(comment);
+    } catch (error) {
+        console.log({ error });
+        res.status(500).send({ error: error.message });
     }
 });
 
