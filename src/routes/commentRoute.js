@@ -76,4 +76,24 @@ commentRoute.get('/:commentIdx', async (req, res) => {
     }
 });
 
+commentRoute.patch('/:commentIdx', async (req, res) => {
+    try {
+        const { commentIdx } = req.params;
+        const { content } = req.body;
+        if (!mongoose.isValidObjectId(commentIdx)) return res.status(400).send({ err: 'invalid commentIdx' });
+        if (typeof content !== 'string') return res.status(400).send({ err: '' });
+
+        const [comment] = await Promise.all([
+            Comment.findByIdAndUpdate(commentIdx, { content }, { new: true }),
+            // 중요 문법
+            Blog.updateOne({ 'comments._id': commentIdx }, { 'comments.$.content': content }),
+        ]);
+
+        return res.send({ comment });
+    } catch (error) {
+        console.log({ error });
+        res.status(500).send({ error });
+    }
+});
+
 module.exports = { commentRoute };
