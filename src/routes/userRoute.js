@@ -2,7 +2,7 @@ const { Router } = require('express');
 const { use } = require('express/lib/router');
 const userRouter = Router();
 const mongoose = require('mongoose');
-const { User } = require('../models');
+const { User, Blog } = require('../models');
 
 userRouter.get('/', async (req, res) => {
     try {
@@ -52,7 +52,7 @@ userRouter.put('/:userId', async (req, res) => {
         if (age) user.age = age;
         if (name) user.name = name;
         console.log({ userAftereEdit: user });
-        await user.save(); // moongose가 updateOne()실행
+        await Promise.all([user.save(), Blog.updateMany({ 'user._id': userId }, { 'user.name': name })]);
         return res.send(user);
     } catch (err) {
         console.log(err);

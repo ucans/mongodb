@@ -14,7 +14,7 @@ const server = async () => {
     try {
         await mongoose.connect(MONGO_URI);
         // useFindAndModify = false 추가하는 게 좋음. 내부적으로 findAndModify 쓰는데, 추천안하기때문.
-        // mongoose.set('debug', true); // Query 변경 보여줌.
+        mongoose.set('debug', true); // Query 변경 보여줌.
         app.use(express.json()); // json parsing
         // Middleware
         app.use('/user', userRouter);
