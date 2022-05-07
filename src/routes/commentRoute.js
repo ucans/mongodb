@@ -4,6 +4,7 @@ const commentRoute = Router({ mergeParams: true });
 const { Blog, User, Comment } = require('../models');
 const mongoose = require('mongoose');
 const res = require('express/lib/response');
+const req = require('express/lib/request');
 
 /**
  * /user
@@ -34,6 +35,7 @@ commentRoute.post('/', async (req, res) => {
 
         // 저장할 때는 user/blog doc에 있는 _id를 참조 저장.
         const comment = new Comment({ content, user, userFullName: `${user.name.first} ${user.name.last}`, blog });
+        // push : 배열 push
         await Promise.all([comment.save(), Blog.updateOne({ _id: blogIdx }, { $push: { comments: comment } })]);
         return res.send({ comment });
     } catch (err) {
@@ -85,7 +87,7 @@ commentRoute.patch('/:commentIdx', async (req, res) => {
 
         const [comment] = await Promise.all([
             Comment.findByIdAndUpdate(commentIdx, { content }, { new: true }),
-            // 중요 문법
+            // 중요 문법!!
             Blog.updateOne({ 'comments._id': commentIdx }, { 'comments.$.content': content }),
         ]);
 
@@ -93,6 +95,20 @@ commentRoute.patch('/:commentIdx', async (req, res) => {
     } catch (error) {
         console.log({ error });
         res.status(500).send({ error });
+    }
+});
+
+commentRoute.delete('/:commentIdx', async (req, res) => {
+    try {
+        const { commentIdx } = req.params;
+        if (!mongoose.isValidObjectId(commentIdx)) return res.status(400).send({ err: 'invalid commentd' });
+        const comment = await Comment.findByIdAndDelete(commentIdx);
+        // $pull : 배열 pop
+        await Blog.updateOne({ '$comments._id': commentIdx }, { $pull: { comments: { _id: commentIdx } } });
+        return res.send({ comment });
+    } catch (err) {
+        console.log({ err });
+        res.status(500).send({ err });
     }
 });
 

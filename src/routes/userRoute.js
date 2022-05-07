@@ -50,9 +50,19 @@ userRouter.put('/:userId', async (req, res) => {
         let user = await User.findById(userId);
         console.log({ userBeforeEdit: user });
         if (age) user.age = age;
-        if (name) user.name = name;
-        console.log({ userAftereEdit: user });
-        await Promise.all([user.save(), Blog.updateMany({ 'user._id': userId }, { 'user.name': name })]);
+        if (name) {
+            user.name = name;
+            await Promise.all([
+                Blog.updateMany({ 'user._id': userId }, { 'user.name': name }),
+                Blog.updateMany(
+                    {},
+                    { 'comments.$[comment].userFullName': `${name.first} ${name.last}` },
+                    { arrayFilters: [{ 'comment.user': userId }] }
+                ),
+            ]);
+        }
+
+        await user.save();
         return res.send(user);
     } catch (err) {
         console.log(err);

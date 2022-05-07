@@ -50,6 +50,7 @@ blogRouter.get('/:blogIdx', async (req, res) => {
         const { blogIdx } = req.params;
         if (!mongoose.isValidObjectId(blogIdx)) res.status(400).send({ err: 'invalid blogId' });
         const blog = await Blog.findById(blogIdx);
+
         return res.send({ blog });
     } catch (err) {
         console.log({ err });
