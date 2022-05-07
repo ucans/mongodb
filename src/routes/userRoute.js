@@ -2,7 +2,7 @@ const { Router } = require('express');
 const { use } = require('express/lib/router');
 const userRouter = Router();
 const mongoose = require('mongoose');
-const { User, Blog } = require('../models');
+const { User, Blog, Comment } = require('../models');
 
 userRouter.get('/', async (req, res) => {
     try {
@@ -70,14 +70,17 @@ userRouter.put('/:userId', async (req, res) => {
     }
 });
 
-// todo : deleteOnd, findOndAndDelete
 userRouter.delete('/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
         if (!mongoose.isValidObjectId(userId)) return res.status(401).send({ err: 'The invalid user.' });
-        // 근데 지우기 전에 DB에 해당 유저 있는 지 체크 어케함?
-        const deletedOne = await User.findByIdAndDelete(userId);
-        res.send(deletedOne);
+        const [deletedOne] = await Promise.all([
+            User.findByIdAndDelete(userId),
+            Blog.deleteMany({ 'user._id': userId }),
+            Blog.updateMany({ 'comments.user': userId }, { $pull: { comments: { user: userId } } }),
+            Comment.deleteMany({ user: userId }),
+        ]);
+        res.send({ user: deletedOne });
     } catch (err) {
         console.log({ err });
         res.status(500).send({ err: err.message });
