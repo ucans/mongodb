@@ -26,10 +26,10 @@ generateFakeData = async (userCount, blogsPerUser, commentsPerUser) => {
             );
         }
 
-        console.log('fake data inserting to database...');
+        console.log('\tfake data inserting to database...');
 
         await User.insertMany(users);
-        console.log(`${users.length} fake users generated!`);
+        console.log(`\t${users.length} fake users generated!`);
 
         users.map((user) => {
             for (let i = 0; i < blogsPerUser; i++) {
@@ -45,7 +45,7 @@ generateFakeData = async (userCount, blogsPerUser, commentsPerUser) => {
         });
 
         let newBlogs = await Promise.all(blogs);
-        console.log(`${newBlogs.length} fake blogs generated!`);
+        console.log(`\t${newBlogs.length} fake blogs generated!`);
 
         users.map((user) => {
             for (let i = 0; i < commentsPerUser; i++) {
@@ -60,8 +60,8 @@ generateFakeData = async (userCount, blogsPerUser, commentsPerUser) => {
         });
 
         await Promise.all(comments);
-        console.log(`${comments.length} fake comments generated!`);
-        console.log('COMPLETE!!');
+        console.log(`\t${comments.length} fake comments generated!`);
+        console.log('\tCOMPLETE!!');
     } catch (err) {
         console.log(err);
     }

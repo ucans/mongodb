@@ -22,7 +22,12 @@ const server = async () => {
 
         app.listen(3000, async () => {
             console.log('server listening on port 3000');
-            // await generateFakeData(3, 5, 20);
+            // console.time('insert time: ');
+            // for (let i = 0; i < 50000; i++) {
+            //     console.log(`${i}'s inserting..`);
+            //     await generateFakeData(10, 10, 10);
+            // }
+            // console.timeEnd('insert time: ');
         });
     } catch (err) {
         console.log(err);

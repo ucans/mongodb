@@ -32,10 +32,18 @@ blogRouter.post('/', async (req, res) => {
 
 blogRouter.get('/', async (req, res) => {
     try {
+        const limitNum = 3;
+
+        let { page, sort } = req.query;
+        page = parseInt(page);
+        sort = parseInt(sort);
         // production에서 사용 가능할 정도의 성능
         // populate를 통해, 총 4번 db 연결
         // 중복된 유저 한 번만 접근 가능
-        const blogs = await Blog.find({}).limit(200);
+        const blogs = await Blog.find({})
+            .sort({ updatedAt: sort }) // 1: 오름차순, -1 : 내림차순
+            .skip(page * limitNum)
+            .limit(limitNum);
         //.populate([{ path: 'user' }, { path: 'comments', populate: { path: 'user' } }]);
 
         return res.send({ blogs });
